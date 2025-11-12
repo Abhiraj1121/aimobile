@@ -1,5 +1,5 @@
 /* ===========================================================
-   Swastik Mini v2.3 — Voice Stable (Fixed mic + recognition)
+   Swastik Mini v2.4 — Stable Chat + Voice (Send fixed)
    =========================================================== */
 
 const HISTORY_KEY = "swastik_mini_history_v2";
@@ -172,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const typing = addTypingSkeleton();
 
     try {
-      const res = await fetch("https://aimobile.onrender.com/api/chat", {
+      const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -195,6 +195,20 @@ document.addEventListener("DOMContentLoaded", () => {
       else addBubble("⚠️ Network error.", "bot");
     }
   }
+
+  /* ---------- Send Button + Enter ---------- */
+  sendBtn?.addEventListener("click", () => {
+    const v = msg.value.trim();
+    if (v) handleUserMessage(v);
+  });
+
+  msg?.addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      const v = msg.value.trim();
+      if (v) handleUserMessage(v);
+    }
+  });
 
   /* ---------- Mic Hold ---------- */
   micBtn.addEventListener("mousedown", e => { e.preventDefault(); startRecognition(handleUserMessage, swastikCore); });
@@ -227,25 +241,25 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("keydown", e => { if (e.key === "Escape") closeOverlay(); });
 
   /* ---------- Toggles ---------- */
-  themeToggle.addEventListener("click", () => {
+  themeToggle?.addEventListener("click", () => {
     const dark = document.body.classList.toggle("dark");
     themeToggle.textContent = dark ? "☀️" : "🌙";
   });
 
-  muteToggle.addEventListener("click", () => {
+  muteToggle?.addEventListener("click", () => {
     isMuted = !isMuted;
     muteToggle.textContent = isMuted ? "🔇" : "🔊";
     if (isMuted) speechSynthesis.cancel();
   });
 
-  voiceOnlyToggle.addEventListener("click", () => {
+  voiceOnlyToggle?.addEventListener("click", () => {
     const active = document.body.classList.toggle("voice-only");
     if (active) openOverlay();
     else closeOverlay();
   });
 
   /* ---------- Clear History ---------- */
-  clearHistoryBtn.addEventListener("click", () => {
+  clearHistoryBtn?.addEventListener("click", () => {
     localStorage.removeItem(HISTORY_KEY);
     messages = [];
     chat.innerHTML = "";
