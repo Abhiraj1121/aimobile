@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Swastik Mini • GGPS Sector 5</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="static/style.css" />
+</head>
+<body class="dark">
+  <div class="container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="static/Swastik.jpg" alt="Swastik Logo" class="logo" />
+        <div>
+          <h1>Swastik</h1>
+          <p class="school">GGPS Sector 5</p>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <button class="chip" data-q="What are the school hours?">School hours</button>
+        <button class="chip" data-q="What is the attendance requirement to sit for exams?">Attendance</button>
+        <button class="chip" data-q="How to pay fees online?">Fee payment</button>
+        <button class="chip" data-q="How to take admission in school?">Admission</button>
+      </div>
+
+      <div class="info">
+        <p><strong>Tips</strong></p>
+        <ul>
+          <li>Tap the orb to open Assistant Mode</li>
+          <li>Hold mic to talk (press & hold)</li>
+          <li>Chat history saved in browser</li>
+        </ul>
+      </div>
+
+      <div class="history-controls">
+        <button id="restoreHistory" class="small-btn">Restore History</button>
+        <button id="clearHistory" class="small-btn danger">Clear History</button>
+      </div>
+
+      <div class="credits">
+        <small>Powered by Swastik • GGPS 11/C</small>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-panel">
+      <!-- TOPBAR: Core + controls -->
+      <header class="topbar">
+        <div class="core-wrapper">
+          <div id="swastikCore" class="swastik-core idle" title="Tap to open Assistant Mode">
+            <div class="core-orb"></div>
+            <div class="core-ring ring-1"></div>
+            <div class="core-ring ring-2"></div>
+            <div class="core-ring ring-3"></div>
+            <div class="particles"></div>
+          </div>
+          <div class="core-labels">
+            <div class="bot-name">Swastik</div>
+            <div id="voiceStatus" class="voice-status">Idle</div>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button id="themeToggle" title="Toggle theme">☀️</button>
+          <button id="muteToggle" title="Mute / Unmute">🔊</button>
+          <button id="voiceOnlyToggle" title="Voice-only mode">🎙️</button>
+          <select id="languageToggle" title="Language">
+            <option value="auto">Auto</option>
+            <option value="en">English</option>
+            <option value="hi">Hindi</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- CHAT AREA -->
+      <section id="chat" class="chat" aria-live="polite"></section>
+
+      <!-- COMPOSER -->
+      <div class="composer">
+        <button id="mic" class="icon-btn mic-btn" title="Hold to talk (press & hold)">
+          <svg class="mic-icon" xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+            <line x1="12" y1="19" x2="12" y2="23"></line>
+          </svg>
+        </button>
+
+        <input id="msg" type="text"
+          placeholder="Ask Swastik about timetable, classes or rules..."
+          autocomplete="off" />
+        <button id="send" class="send-btn">Send</button>
+      </div>
+    </main>
+  </div>
+
+  <!-- 🎙️ VOICE-ONLY / ASSISTANT OVERLAY -->
+  <div id="assistantOverlay" class="assistant-overlay" aria-hidden="true">
+    <div class="assistant-panel">
+      <!-- ❌ Close button -->
+      <button id="assistantClose" class="close-btn" title="Close Assistant Mode">×</button>
+
+      <!-- Core Orb -->
+      <div id="assistantCore" class="assistant-core">
+        <div class="assistant-outer"></div>
+        <div class="assistant-orb"></div>
+        <div class="assistant-wave"></div>
+      </div>
+
+      <div id="assistantHint" class="assistant-hint">
+        Hold the orb to speak — release to let Swastik reply.
+      </div>
+
+      <div class="assistant-actions">
+        <button id="assistantToggleListen" class="small-btn primary">
+          Start Listening
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="static/script.js"></script>
+</body>
+</html>
