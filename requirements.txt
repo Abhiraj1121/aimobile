@@ -1,5 +1,5 @@
-flask
+Flask
 requests
 python-dotenv
-flask-cors
+Flask-cors
 gTTS
