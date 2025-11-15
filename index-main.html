@@ -1,0 +1,116 @@
+<!-- templates/index.html (Mobile-First Full Rewrite) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Swastik • GGPS Sector 5</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="icon" href="/static/Swastik.jpg">
+    <meta name="theme-color" content="#7f5af0">
+</head>
+<body class="dark">
+    <!-- Mobile Menu Overlay (Slide from Left) -->
+    <div id="mobileMenu" class="mobile-menu">
+        <div class="menu-header">
+            <img src="/static/Swastik.jpg" alt="Swastik" class="menu-logo">
+            <h2>Swastik</h2>
+            <p>GGPS Sector 5</p>
+            <button id="closeMenu" class="close-menu">×</button>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="menu-section">
+            <h3>Quick Questions</h3>
+            <div class="quick-chips">
+                <button class="chip" data-q="What are the school hours?">School hours</button>
+                <button class="chip" data-q="What is the attendance requirement to sit for exams?">Attendance</button>
+                <button class="chip" data-q="How to pay fees online?">Fee payment</button>
+                <button class="chip" data-q="How to take admission in school?">Admission</button>
+            </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="menu-section">
+            <h3>Settings</h3>
+            <button id="themeToggleMenu" class="menu-toggle">☀️ Dark/Light</button>
+            <button id="muteToggleMenu" class="menu-toggle">🔊 Sound On</button>
+            <button id="voiceOnlyToggleMenu" class="menu-toggle">🎙️ Voice Mode</button>
+        </div>
+
+        <!-- History -->
+        <div class="menu-section">
+            <h3>Chat History</h3>
+            <div class="history-controls">
+                <button id="clearHistoryMenu" class="small-btn danger">Clear History</button>
+            </div>
+        </div>
+
+        <div class="menu-footer">
+            <small>Powered by Swastik • GGPS 11/C</small>
+        </div>
+    </div>
+    <div id="menuBackdrop" class="menu-backdrop"></div>
+
+    <!-- Main App (Full Screen Chat) -->
+    <div class="app-container">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button id="openMenu" class="menu-btn">☰</button>
+            <div class="core-wrapper">
+                <div id="swastikCore" class="swastik-core" title="Tap for Voice Mode">
+                    <div class="core-orb"></div>
+                    <div class="core-ring ring-1"></div>
+                    <div class="core-ring ring-2"></div>
+                    <div class="core-ring ring-3"></div>
+                    <div class="particles"></div>
+                </div>
+                <div class="core-labels">
+                    <div class="bot-name">Swastik</div>
+                    <div id="voiceStatus" class="voice-status">Ready to chat</div>
+                </div>
+            </div>
+            <div class="top-actions">
+                <button id="themeToggle" title="Theme">🌙</button>
+                <button id="muteToggle" title="Sound">🔊</button>
+            </div>
+        </header>
+
+        <!-- Full Screen Chat -->
+        <main id="chat" class="chat" aria-live="polite"></main>
+
+        <!-- Sticky Composer -->
+        <div class="composer">
+            <button id="mic" class="mic-btn" title="Hold to speak">
+                <svg class="mic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                </svg>
+            </button>
+            <input id="msg" type="text" placeholder="Ask about school..." autocomplete="off">
+            <button id="send" class="send-btn">
+                <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22,2 15,22 11,13 2,9 22,2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Voice-Only Overlay (Full Screen) -->
+    <div id="voiceOverlay" class="voice-overlay">
+        <button id="closeVoice" class="close-overlay">×</button>
+        <div class="voice-panel">
+            <div id="voiceCore" class="voice-core">
+                <div class="voice-orb"></div>
+                <div class="voice-wave"></div>
+            </div>
+            <p class="voice-hint">Hold here to speak • Release to hear reply</p>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>
