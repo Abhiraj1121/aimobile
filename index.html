@@ -3,63 +3,332 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Swastik Mini - Maintenance</title>
+  <title>Swastik • Under Construction</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet" />
+
   <style>
-    body {
+    :root {
+      --bg-dark: #0a0e1f;
+      --accent-purple: #7f5af0;
+      --accent-blue: #00e5ff;
+      --accent-pink: #ff77e9;
+      --glass: rgba(255, 255, 255, 0.08);
+      --text: #e8f1ff;
+      --muted: #a0a8c0;
+    }
+
+    * {
       margin: 0;
       padding: 0;
-      font-family: "Inter", sans-serif;
-      background: linear-gradient(135deg, #ff7ae5, #6a5af9, #00d5ff);
-      background-size: 300% 300%;
-      animation: flow 10s ease infinite;
-      color: white;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      overflow: hidden;
+      height: 100vh;
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      text-align: center;
+      position: relative;
     }
 
-    @keyframes flow {
-      0% { background-position: 0% 50%; }
+    /* Animated Background */
+    body::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(127, 90, 240, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.25) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 119, 233, 0.15) 0%, transparent 60%);
+      background-size: 200% 200%;
+      animation: bgFlow 18s ease infinite;
+      z-index: -2;
+    }
+
+    @keyframes bgFlow {
+      0%, 100% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
-      100% { background-position: 0% 50%; }
     }
 
+    /* Floating Particles */
+    .particles {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--accent-blue);
+      border-radius: 50%;
+      opacity: 0;
+      box-shadow: 0 0 10px var(--accent-blue);
+      animation: float 8s infinite ease-in-out;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-20px) scale(1); opacity: 0; }
+    }
+
+    /* 3D Glass Orb */
+    .orb-container {
+      perspective: 1000px;
+      margin-bottom: 2rem;
+    }
+
+    .swastik-orb {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      position: relative;
+      background: radial-gradient(circle at 30% 30%,
+                  rgba(255,255,255,0.5) 0%,
+                  rgba(127,90,240,0.3) 40%,
+                  rgba(0,229,255,0.15) 70%,
+                  transparent 100%);
+      box-shadow:
+          0 0 40px rgba(127,90,240,0.6),
+          0 0 80px rgba(0,229,255,0.3),
+          inset 0 8px 16px rgba(255,255,255,0.4),
+          inset 0 -8px 16px rgba(0,0,0,0.25);
+      animation: rotate3D 8s infinite linear, pulse 3s ease-in-out infinite;
+      transform-style: preserve-3d;
+    }
+
+    .swastik-orb::before {
+      content: '';
+      position: absolute;
+      inset: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%,
+                  rgba(255,255,255,0.7) 0%,
+                  rgba(127,90,240,0.45) 45%,
+                  rgba(0,229,255,0.25) 75%,
+                  transparent 100%);
+      box-shadow: inset 0 6px 14px rgba(255,255,255,0.6),
+                  inset 0 -6px 14px rgba(0,0,0,0.2);
+    }
+
+    .swastik-orb::after {
+      content: '';
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(255,255,255,0.5));
+      box-shadow: 0 0 20px rgba(255,255,255,0.9);
+      filter: blur(1px);
+    }
+
+    @keyframes rotate3D {
+      from { transform: rotateY(0deg) rotateX(5deg); }
+      to { transform: rotateY(360deg) rotateX(5deg); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    /* Glass Card */
     .card {
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 2rem;
       width: 90%;
-      max-width: 350px;
-      background: rgba(255, 255, 255, 0.18);
-      backdrop-filter: blur(10px);
-      padding: 30px 25px;
-      border-radius: 18px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.25);
+      max-width: 380px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+       815        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      animation: cardFloat 6s ease-in-out infinite;
     }
 
-    .icon {
-      font-size: 50px;
-      margin-bottom: 15px;
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
     }
 
     h1 {
-      font-size: 1.6rem;
-      margin-bottom: 8px;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.8rem;
+      margin: 1rem 0 0.5rem;
+      background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
     }
 
     p {
       font-size: 1rem;
       opacity: 0.9;
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .status {
+      font-size: 0.9rem;
+      color: var(--accent-blue);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      font-family: 'Space Grotesk', monospace;
+    }
+
+    .time-box {
+      background: rgba(127, 90, 240, 0.2);
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      min-width: 60px;
+      border: 1px solid rgba(127, 90, 240, 0.3);
+    }
+
+    .time-box span {
+      display: block;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+    }
+
+    .time-box small {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* Theme Toggle */
+    .theme-toggle {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--glass);
+      border: none;
+      color: white;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* Light Mode */
+    body.light {
+      --bg-dark: #f5f8ff;
+      --text: #1a1a2e;
+      --muted: #666;
+      --glass: rgba(255, 255, 255, 0.7);
+    }
+
+    body.light .card {
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(0,0,0,0.1);
+    }
+
+    body.light .swastik-orb {
+      box-shadow:
+          0 0 40px rgba(127,90,240,0.4),
+          0 0 80px rgba(0,229,255,0.2),
+          inset 0 8px 16px rgba(255,255,255,0.6),
+          inset 0 -8px 16px rgba(0,0,0,0.15);
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .swastik-orb { width: 120px; height: 120px; }
+      .swastik-orb::after { top: 24px; left: 24px; width: 24px; height: 24px; }
+      h1 { font-size: 1.5rem; }
+      .countdown { gap: 0.75rem; }
+      .time-box { padding: 0.6rem 0.8rem; }
+      .time-box span { font-size: 1.2rem; }
     }
   </style>
 </head>
-<body>
+<body class="dark">
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle">Light/Dark</button>
+
+  <!-- Floating Particles -->
+  <div class="particles" id="particles"></div>
 
   <div class="card">
-    <div class="icon">🔧</div>
-    <h1>Swastik Mini is Under Maintenance</h1>
-    <p>We’re optimizing for mobile devices. Swastik Mini will be back soon!</p>
+    <!-- 3D Orb -->
+    <div class="orb-container">
+      <div class="swastik-orb"></div>
+    </div>
+
+    <h1>Swastik is Evolving</h1>
+    <p class="status">Optimizing for Mobile • AI Upgrades • 3D UI</p>
+    <p>We’re making Swastik faster, smarter, and more beautiful. Back in a few minutes!</p>
+
+    <!-- Countdown (Optional) -->
+    <div class="countdown">
+      <div class="time-box"><span id="mins">05</span><small>Min</small></div>
+      <div class="time-box"><span id="secs">00</span><small>Sec</small></div>
+    </div>
   </div>
 
+  <script>
+    // Theme Toggle
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      document.getElementById('themeToggle').textContent = isLight ? 'Dark' : 'Light';
+    });
+
+    // Particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDelay = Math.random() * 8 + 's';
+      p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+      particlesContainer.appendChild(p);
+    }
+
+    // Countdown (5 minutes)
+    let time = 5 * 60;
+    const minsEl = document.getElementById('mins');
+    const secsEl = document.getElementById('secs');
+
+    const timer = setInterval(() => {
+      time--;
+      const mins = String(Math.floor(time / 60)).padStart(2, '0');
+      const secs = String(time % 60).padStart(2, '0');
+      minsEl.textContent = mins;
+      secsEl.textContent = secs;
+
+      if (time <= 0) {
+        clearInterval(timer);
+        document.querySelector('.status').textContent = 'Swastik is Back Online!';
+        document.querySelector('p').textContent = 'Refresh to continue.';
+      }
+    }, 1000);
+  </script>
 </body>
 </html>
