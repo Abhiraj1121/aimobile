@@ -1,302 +1,336 @@
-// static/script.js (Complete Mobile Rewrite • Clean & Modular)
-class SwastikApp {
-  constructor() {
-    this.messages = [];
-    this.recognition = null;
-    this.listening = false;
-    this.isMuted = false;
-    this.HISTORY_KEY = 'swastik_mobile_history_v2';
-    this.HISTORY_LIMIT = 20;
+// static/script.js – Mobile-First, Clean & Robust + Typing Animation
+document.addEventListener('DOMContentLoaded', () => {
+  // =================================================================
+  // 1. MOBILE KEYBOARD + AUTO-SCROLL
+  // =================================================================
+  const chat = document.getElementById('chat');
+  let initialHeight = window.innerHeight;
 
-    this.elements = {};
-    this.initElements();
-    this.loadHistory();
-    this.initRecognition();
-    this.bindEvents();
-    this.addGreeting();
-    this.handleKeyboard();
-  }
-
-  initElements() {
-    const ids = [
-      'chat', 'msg', 'send', 'mic', 'swastikCore', 'voiceStatus',
-      'themeToggle', 'muteToggle', 'openMenu', 'closeMenu', 'menuBackdrop',
-      'voiceOverlay', 'voiceCore', 'closeVoice', 'clearHistoryMenu',
-      'themeToggleMenu', 'muteToggleMenu', 'voiceOnlyToggleMenu'
-    ];
-    ids.forEach(id => {
-      this.elements[id] = document.getElementById(id);
+  const scrollToBottom = () => {
+    requestAnimationFrame(() => {
+      chat.scrollTop = chat.scrollHeight;
     });
-    this.elements.chips = document.querySelectorAll('.chip');
-  }
+  };
 
-  bindEvents() {
-    // Send
-    this.elements.send.addEventListener('click', () => this.sendMessage());
-    this.elements.msg.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        this.sendMessage();
-      }
-    });
+  const observer = new MutationObserver(scrollToBottom);
+  observer.observe(chat, { childList: true, subtree: true });
 
-    // Mic Hold (Touch/Mouse)
-    const micEvents = {
-      start: ['mousedown', 'touchstart'],
-      end: ['mouseup', 'touchend', 'mouseleave']
-    };
-    micEvents.start.forEach(ev => this.elements.mic.addEventListener(ev, (e) => {
-      e.preventDefault();
-      this.startListening();
-    }));
-    micEvents.end.forEach(ev => this.elements.mic.addEventListener(ev, (e) => {
-      e.preventDefault();
-      this.stopListening();
-    }));
+  window.visualViewport?.addEventListener('resize', () => {
+    const diff = initialHeight - window.visualViewport.height;
+    chat.style.paddingBottom = diff > 100 ? `${diff + 140}px` : '140px';
+    scrollToBottom();
+  });
 
-    // Voice Core Hold
-    const voiceCore = this.elements.voiceCore;
-    if (voiceCore) {
-      micEvents.start.forEach(ev => voiceCore.addEventListener(ev, (e) => {
-        e.preventDefault();
-        this.startListening(true);
-      }));
-      micEvents.end.forEach(ev => voiceCore.addEventListener(ev, (e) => {
-        e.preventDefault();
-        this.stopListening();
-      }));
+  scrollToBottom();
+
+  // =================================================================
+  // 2. SWASTIK APP CORE
+  // =================================================================
+  class SwastikApp {
+    constructor() {
+      this.messages = [];
+      this.recognition = null;
+      this.listening = false;
+      this.isMuted = false;
+      this.HISTORY_KEY = 'swastik_chat_history';
+      this.HISTORY_LIMIT = 30;
+
+      this.elements = this.getElements();
+      this.loadHistory();
+      this.initSpeech();
+      this.bindEvents();
+      this.addGreeting();
     }
 
-    // Menu
-    this.elements.openMenu.addEventListener('click', () => this.openMenu());
-    this.elements.closeMenu.addEventListener('click', () => this.closeMenu());
-    this.elements.menuBackdrop.addEventListener('click', () => this.closeMenu());
-    this.elements.closeVoice.addEventListener('click', () => this.closeVoiceOverlay());
+    getElements() {
+      return {
+        chat: document.getElementById('chat'),
+        input: document.getElementById('msg'),
+        send: document.getElementById('send'),
+        mic: document.getElementById('mic'),
+        swastikCore: document.getElementById('swastikCore'),
+        voiceStatus: document.getElementById('voiceStatus'),
+        voiceCore: document.getElementById('voiceCore'),
+        themeToggle: document.getElementById('themeToggle'),
+        muteToggle: document.getElementById('muteToggle'),
+        openMenu: document.getElementById('openMenu'),
+        closeMenu: document.getElementById('closeMenu'),
+        menuBackdrop: document.getElementById('menuBackdrop'),
+        mobileMenu: document.getElementById('mobileMenu'),
+        themeToggleMenu: document.getElementById('themeToggleMenu'),
+        muteToggleMenu: document.getElementById('muteToggleMenu'),
+        voiceOnlyToggleMenu: document.getElementById('voiceOnlyToggleMenu'),
+        clearHistoryMenu: document.getElementById('clearHistoryMenu'),
+        closeVoice: document.getElementById('closeVoice'),
+        voiceOverlay: document.getElementById('voiceOverlay'),
+        chips: document.querySelectorAll('.chip')
+      };
+    }
 
-    // Swastik Core → Voice Overlay
-    this.elements.swastikCore.addEventListener('click', () => this.openVoiceOverlay());
-
-    // Toggles (Topbar + Menu)
-    ['themeToggle', 'themeToggleMenu'].forEach(id => {
-      const el = this.elements[id];
-      if (el) el.addEventListener('click', () => this.toggleTheme());
-    });
-    ['muteToggle', 'muteToggleMenu'].forEach(id => {
-      const el = this.elements[id];
-      if (el) el.addEventListener('click', () => this.toggleMute());
-    });
-    ['voiceOnlyToggleMenu'].forEach(id => {
-      const el = this.elements[id];
-      if (el) el.addEventListener('click', () => this.toggleVoiceOverlay());
-    });
-
-    // Clear History
-    const clearBtns = [this.elements.clearHistoryMenu];
-    clearBtns.forEach(btn => btn?.addEventListener('click', () => this.clearHistory()));
-
-    // Chips
-    this.elements.chips.forEach(chip => {
-      chip.addEventListener('click', () => {
-        const q = chip.dataset.q;
-        if (q) {
-          this.sendMessage(q);
-          this.closeMenu();
+    bindEvents() {
+      this.elements.send.addEventListener('click', () => this.send());
+      this.elements.input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          this.send();
         }
       });
-    });
 
-    // Auto-focus input
-    this.elements.msg.focus();
-  }
+      ['mousedown', 'touchstart'].forEach(ev =>
+        this.elements.mic.addEventListener(ev, (e) => {
+          e.preventDefault();
+          this.startListening();
+        })
+      );
+      ['mouseup', 'touchend', 'mouseleave'].forEach(ev =>
+        this.elements.mic.addEventListener(ev, (e) => {
+          e.preventDefault();
+          this.stopListening();
+        })
+      );
 
-  async sendMessage(text = null) {
-    const msg = text || this.elements.msg.value.trim();
-    if (!msg) return;
+      if (this.elements.voiceCore) {
+        ['mousedown', 'touchstart'].forEach(ev =>
+          this.elements.voiceCore.addEventListener(ev, (e) => {
+            e.preventDefault();
+            this.startListening(true);
+          })
+        );
+        ['mouseup', 'touchend', 'mouseleave'].forEach(ev =>
+          this.elements.voiceCore.addEventListener(ev, (e) => {
+            e.preventDefault();
+            this.stopListening();
+          })
+        );
+      }
 
-    this.messages.push({ role: 'user', content: msg });
-    this.addBubble(msg, 'user');
-    this.elements.msg.value = '';
+      this.elements.openMenu?.addEventListener('click', () => this.openMenu());
+      this.elements.closeMenu?.addEventListener('click', () => this.closeMenu());
+      this.elements.menuBackdrop?.addEventListener('click', () => this.closeMenu());
+      this.elements.closeVoice?.addEventListener('click', () => this.closeVoiceOverlay());
+      this.elements.swastikCore?.addEventListener('click', () => this.openVoiceOverlay());
 
-    const typingEl = this.addTypingBubble();
-    try {
-      const res = await fetch('/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg, history: this.messages.slice(-this.HISTORY_LIMIT) })
+      [this.elements.themeToggle, this.elements.themeToggleMenu].forEach(btn =>
+        btn?.addEventListener('click', () => this.toggleTheme())
+      );
+      [this.elements.muteToggle, this.elements.muteToggleMenu].forEach(btn =>
+        btn?.addEventListener('click', () => this.toggleMute())
+      );
+      this.elements.voiceOnlyToggleMenu?.addEventListener('click', () => this.toggleVoiceOverlay());
+      this.elements.clearHistoryMenu?.addEventListener('click', () => this.clearHistory());
+
+      this.elements.chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+          const q = chip.dataset.q;
+          if (q) this.send(q);
+          this.closeMenu();
+        });
       });
-      const data = await res.json();
-      typingEl.remove();
 
-      const reply = data.reply || 'Sorry, I couldn\'t process that.';
-      this.messages.push({ role: 'assistant', content: reply });
-      this.addBubble(reply, 'bot');
-      if (!this.isMuted) this.speak(reply);
-    } catch (err) {
-      typingEl.remove();
-      this.addBubble('⚠️ Connection error. Try again!', 'bot');
+      this.elements.input.focus();
     }
-    this.saveHistory();
-    this.scrollToBottom();
-  }
 
-  addBubble(text, type) {
-    const bubble = document.createElement('div');
-    bubble.className = `bubble ${type}`;
-    bubble.innerHTML = `
-      <div>${text}</div>
-      <div class="meta">${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-    `;
-    this.elements.chat.appendChild(bubble);
-    this.scrollToBottom();
-  }
+    async send(text = null) {
+      const msg = (text || this.elements.input.value.trim());
+      if (!msg) return;
 
-  addTypingBubble() {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble bot typing';
-    bubble.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-    this.elements.chat.appendChild(bubble);
-    this.scrollToBottom();
-    return bubble;
-  }
+      this.messages.push({ role: 'user', content: msg });
+      this.addBubble(msg, 'user');
+      this.elements.input.value = '';
 
-  speak(text) {
-    if (this.isMuted || !('speechSynthesis' in window)) return;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = /[अ-ह]/.test(text) ? 'hi-IN' : 'en-IN';
-    utterance.rate = 0.95;
-    utterance.pitch = 1.05;
-    speechSynthesis.cancel();
-    speechSynthesis.speak(utterance);
-  }
+      // Show typing bubble
+      const typingBubble = this.addBubble('', 'bot');
+      const typingText = typingBubble.querySelector('.typing-text');
 
-  initRecognition() {
-    if (!('webkitSpeechRecognition' in window)) return;
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    this.recognition = new SpeechRecognition();
-    this.recognition.lang = 'en-IN';
-    this.recognition.interimResults = false;
-    this.recognition.continuous = false;
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: msg,
+            history: this.messages.slice(-this.HISTORY_LIMIT)
+          })
+        });
+        const data = await res.json();
 
-    this.recognition.onstart = () => {
-      this.listening = true;
-      this.elements.mic?.classList.add('listening');
-      this.elements.swastikCore?.classList.add('listening', 'active');
-      this.elements.voiceCore?.classList.add('listening');
-      this.elements.voiceStatus.textContent = 'Listening...';
-    };
+        // Remove typing bubble
+        typingBubble.remove();
 
-    this.recognition.onresult = (e) => {
-      const transcript = e.results[0][0].transcript.trim();
-      this.sendMessage(transcript);
-    };
-
-    this.recognition.onerror = this.recognition.onend = () => {
-      this.stopListening();
-    };
-  }
-
-  startListening(voiceMode = false) {
-    if (this.listening || !this.recognition) return;
-    if (voiceMode) this.openVoiceOverlay();
-    this.recognition.start();
-  }
-
-  stopListening() {
-    if (!this.listening) return;
-    this.recognition?.stop();
-    this.listening = false;
-    this.elements.mic?.classList.remove('listening');
-    this.elements.swastikCore?.classList.remove('listening', 'active');
-    this.elements.voiceCore?.classList.remove('listening');
-    this.elements.voiceStatus.textContent = 'Ready to chat';
-  }
-
-  openMenu() {
-    document.getElementById('mobileMenu').classList.add('open');
-    document.getElementById('menuBackdrop').classList.add('active');
-  }
-
-  closeMenu() {
-    document.getElementById('mobileMenu').classList.remove('open');
-    document.getElementById('menuBackdrop').classList.remove('active');
-  }
-
-  openVoiceOverlay() {
-    document.getElementById('voiceOverlay').classList.add('active');
-  }
-
-  closeVoiceOverlay() {
-    document.getElementById('voiceOverlay').classList.remove('active');
-    this.stopListening();
-  }
-
-  toggleVoiceOverlay() {
-    if (document.getElementById('voiceOverlay').classList.contains('active')) {
-      this.closeVoiceOverlay();
-    } else {
-      this.openVoiceOverlay();
-    }
-  }
-
-  toggleTheme() {
-    document.body.classList.toggle('light');
-    const isLight = document.body.classList.contains('light');
-    document.querySelectorAll('#themeToggle, #themeToggleMenu').forEach(el => {
-      el.textContent = isLight ? '🌙' : '☀️';
-    });
-  }
-
-  toggleMute() {
-    this.isMuted = !this.isMuted;
-    document.querySelectorAll('#muteToggle, #muteToggleMenu').forEach(el => {
-      el.textContent = this.isMuted ? '🔇' : '🔊';
-    });
-    if (this.isMuted) speechSynthesis.cancel();
-  }
-
-  clearHistory() {
-    this.messages = [];
-    this.elements.chat.innerHTML = '';
-    this.addBubble('🗑️ Chat cleared! Start fresh.', 'bot');
-    localStorage.removeItem(this.HISTORY_KEY);
-    this.closeMenu();
-  }
-
-  saveHistory() {
-    localStorage.setItem(this.HISTORY_KEY, JSON.stringify(this.messages.slice(-this.HISTORY_LIMIT)));
-  }
-
-  loadHistory() {
-    try {
-      const saved = localStorage.getItem(this.HISTORY_KEY);
-      if (saved) {
-        this.messages = JSON.parse(saved);
-        this.messages.forEach(msg => this.addBubble(msg.content, msg.role));
+        const reply = data.reply || "Sorry, I couldn't respond.";
+        this.messages.push({ role: 'assistant', content: reply });
+        this.addBubble(reply, 'bot'); // triggers typing animation
+        if (!this.isMuted) this.speak(reply);
+      } catch {
+        typingBubble.remove();
+        this.addBubble('Connection error. Try again.', 'bot');
       }
-    } catch {}
-  }
+      this.saveHistory();
+    }
 
-  addGreeting() {
-    if (this.messages.length === 0) {
-      this.addBubble('👋 Hi! Hold the mic or tap the orb to talk about school. Or type below!', 'bot');
+    // === TYPING ANIMATION + BUBBLE ===
+    addBubble(text, type) {
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${type}`;
+      const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+      if (type === 'bot' && text) {
+        // Bot reply with typing
+        bubble.innerHTML = `
+          <div class="typing-container">
+            <span class="typing-text"></span>
+            <span class="typing-cursor">|</span>
+          </div>
+          <div class="meta">${time}</div>
+        `;
+        this.elements.chat.appendChild(bubble);
+        this.typeReply(bubble.querySelector('.typing-text'), text);
+      } else {
+        // User or empty typing bubble
+        bubble.innerHTML = text
+          ? `<div>${text}</div><div class="meta">${time}</div>`
+          : `<div class="typing-container"><span class="typing-text"></span><span class="typing-cursor">|</span></div><div class="meta">${time}</div>`;
+        this.elements.chat.appendChild(bubble);
+        if (!text) scrollToBottom();
+      }
+      return bubble;
+    }
+
+    typeReply(element, text, speed = 30) {
+      let i = 0;
+      const cursor = element.parentNode.querySelector('.typing-cursor');
+      cursor.style.animation = 'blink 1s step-end infinite';
+
+      const type = () => {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          i++;
+          scrollToBottom();
+          setTimeout(type, speed + Math.random() * 20);
+        } else {
+          cursor.style.display = 'none';
+        }
+      };
+      setTimeout(type, 300);
+    }
+
+    speak(text) {
+      if (this.isMuted || !('speechSynthesis' in window)) return;
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = /[अ-ह]/.test(text) ? 'hi-IN' : 'en-IN';
+      utter.rate = 0.95;
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    }
+
+    initSpeech() {
+      if (!('webkitSpeechRecognition' in window)) return;
+      const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
+      this.recognition = new Rec();
+      this.recognition.lang = 'en-IN';
+      this.recognition.continuous = false;
+      this.recognition.interimResults = false;
+
+      this.recognition.onstart = () => {
+        this.listening = true;
+        this.elements.mic?.classList.add('listening');
+        this.elements.swastikCore?.classList.replace('idle', 'listening');
+        this.elements.voiceCore?.classList.replace('idle', 'listening');
+        this.elements.voiceStatus.textContent = 'Listening...';
+      };
+
+      this.recognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript.trim();
+        this.send(transcript);
+      };
+
+      this.recognition.onerror = this.recognition.onend = () => {
+        this.stopListening();
+      };
+    }
+
+    startListening(voiceMode = false) {
+      if (this.listening || !this.recognition) return;
+      if (voiceMode) this.openVoiceOverlay();
+      this.recognition.start();
+    }
+
+    stopListening() {
+      if (!this.listening) return;
+      this.recognition?.stop();
+      this.listening = false;
+      this.elements.mic?.classList.remove('listening');
+      this.elements.swastikCore?.classList.replace('listening', 'idle');
+      this.elements.voiceCore?.classList.replace('listening', 'idle');
+      this.elements.voiceStatus.textContent = 'Ready to chat';
+    }
+
+    openMenu() { this.elements.mobileMenu.classList.add('open'); this.elements.menuBackdrop.classList.add('active'); }
+    closeMenu() { this.elements.mobileMenu.classList.remove('open'); this.elements.menuBackdrop.classList.remove('active'); }
+    openVoiceOverlay() { this.elements.voiceOverlay.classList.add('active'); }
+    closeVoiceOverlay() { this.elements.voiceOverlay.classList.remove('active'); this.stopListening(); }
+    toggleVoiceOverlay() { this.elements.voiceOverlay.classList.contains('active') ? this.closeVoiceOverlay() : this.openVoiceOverlay(); }
+
+    toggleTheme() {
+      document.body.classList.toggle('light');
+      const isLight = document.body.classList.contains('light');
+      const icon = isLight
+        ? `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
+        : `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42"/></svg>`;
+      const label = isLight ? 'Dark Mode' : 'Light Mode';
+      [this.elements.themeToggle, this.elements.themeToggleMenu].forEach(el => {
+        if (el) {
+          el.innerHTML = `${icon} <span class="label">${label}</span>`;
+          el.title = label;
+        }
+      });
+    }
+
+    toggleMute() {
+      this.isMuted = !this.isMuted;
+      const icon = this.isMuted
+        ? `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M1 12h22"/></svg>`
+        : `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
+      const label = this.isMuted ? 'Unmute' : 'Mute';
+      [this.elements.muteToggle, this.elements.muteToggleMenu].forEach(el => {
+        if (el) {
+          el.innerHTML = `${icon} <span class="label">${label}</span>`;
+          el.title = label;
+        }
+      });
+      if (this.isMuted) speechSynthesis.cancel();
+    }
+
+    clearHistory() {
+      this.messages = [];
+      this.elements.chat.innerHTML = '';
+      this.addBubble('Chat cleared!', 'bot');
+      localStorage.removeItem(this.HISTORY_KEY);
+      this.closeMenu();
+    }
+
+    saveHistory() {
+      localStorage.setItem(this.HISTORY_KEY, JSON.stringify(this.messages.slice(-this.HISTORY_LIMIT)));
+    }
+
+    loadHistory() {
+      try {
+        const saved = localStorage.getItem(this.HISTORY_KEY);
+        if (saved) {
+          this.messages = JSON.parse(saved);
+          this.messages.forEach(m => this.addBubble(m.content, m.role));
+        }
+      } catch (e) { console.error('History load failed', e); }
+    }
+
+    addGreeting() {
+      if (this.messages.length === 0) {
+        this.addBubble('Hi! Hold mic or tap orb to talk. Or type below!', 'bot');
+      }
     }
   }
 
-  scrollToBottom() {
-    this.elements.chat.scrollTop = this.elements.chat.scrollHeight;
-  }
-
-  handleKeyboard() {
-    let initialHeight = window.innerHeight;
-    window.visualViewport?.addEventListener('resize', () => {
-      const vh = window.visualViewport.height;
-      if (vh < initialHeight * 0.9) {
-        this.scrollToBottom();
-      }
-    });
-    window.addEventListener('resize', () => this.scrollToBottom());
-  }
-}
-
-// Initialize on load
-document.addEventListener('DOMContentLoaded', () => new SwastikApp());
+  // =================================================================
+  // 3. START APP
+  // =================================================================
+  new SwastikApp();
+});
