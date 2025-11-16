@@ -192,35 +192,6 @@
       font-weight: 600;
     }
 
-    .countdown {
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      margin: 1.5rem 0;
-      font-family: 'Space Grotesk', monospace;
-    }
-
-    .time-box {
-      background: rgba(127, 90, 240, 0.2);
-      padding: 0.75rem 1rem;
-      border-radius: 12px;
-      min-width: 60px;
-      border: 1px solid rgba(127, 90, 240, 0.3);
-    }
-
-    .time-box span {
-      display: block;
-      font-size: 1.4rem;
-      font-weight: 700;
-      color: var(--accent-blue);
-    }
-
-    .time-box small {
-      font-size: 0.7rem;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-
     /* Theme Toggle */
     .theme-toggle {
       position: absolute;
@@ -272,7 +243,7 @@
 </head>
 <body class="dark">
   <!-- Theme Toggle -->
-  <button class="theme-toggle" id="themeToggle">Light/Dark</button>
+  <button class="theme-toggle" id="themeToggle">☀️</button>
 
   <!-- Floating Particles -->
   <div class="particles" id="particles"></div>
@@ -285,52 +256,15 @@
 
     <h1>Swastik is Evolving</h1>
     <p class="status">Optimizing for Mobile • AI Upgrades • 3D UI</p>
-    <p>We’re making Swastik faster, smarter, and more beautiful. Back in a few minutes!</p>
-
-    <!-- Countdown (Optional) -->
-    <div class="countdown">
-      <div class="time-box"><span id="mins">05</span><small>Min</small></div>
-      <div class="time-box"><span id="secs">00</span><small>Sec</small></div>
-    </div>
-  </div>
-
+    <p>We’re making Swastik faster, smarter, and more beautiful. Back in few days!</p>
   <script>
     // Theme Toggle
     document.getElementById('themeToggle').addEventListener('click', () => {
       document.body.classList.toggle('light');
       const isLight = document.body.classList.contains('light');
-      document.getElementById('themeToggle').textContent = isLight ? 'Dark' : 'Light';
+      document.getElementById('themeToggle').textContent = isLight ? '🌑' : '☀️';
     });
 
-    // Particles
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 30; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = Math.random() * 100 + 'vw';
-      p.style.animationDelay = Math.random() * 8 + 's';
-      p.style.animationDuration = (Math.random() * 5 + 5) + 's';
-      particlesContainer.appendChild(p);
-    }
-
-    // Countdown (5 minutes)
-    let time = 144 * 60;
-    const minsEl = document.getElementById('mins');
-    const secsEl = document.getElementById('secs');
-
-    const timer = setInterval(() => {
-      time--;
-      const mins = String(Math.floor(time / 60)).padStart(2, '0');
-      const secs = String(time % 60).padStart(2, '0');
-      minsEl.textContent = mins;
-      secsEl.textContent = secs;
-
-      if (time <= 0) {
-        clearInterval(timer);
-        document.querySelector('.status').textContent = 'Swastik is Back Online!';
-        document.querySelector('p').textContent = 'Refresh to continue.';
-      }
-    }, 1000);
   </script>
 </body>
 </html>
