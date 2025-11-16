@@ -143,7 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const typingText = typingBubble.querySelector('.typing-text');
 
       try {
-        const res = await fetch('/api/chat', {
+        const res = await fetch('https://aimobile.onrender.com/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
