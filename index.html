@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Swastik • Under Construction</title>
-  <link rel="icon" type="image/png" sizes="32x32" href="static/Swastik.jpg">
-  <link rel="apple-touch-icon" href="static/Swastik.jpg">
+  <link rel="icon" type="image/jpg" size=32×32 href="static/swastik.jpg" />
+  <link rel="apple-touch-icon" href="static/swastik.jpg" />
 
   <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet" />
@@ -241,7 +241,7 @@
     }
   </style>
 </head>
-<body class="dark">
+<body class="Dark">
   <!-- Theme Toggle -->
   <button class="theme-toggle" id="themeToggle">☀️</button>
 
@@ -257,6 +257,8 @@
     <h1>Swastik is Evolving</h1>
     <p class="status">Optimizing for Mobile • AI Upgrades • 3D UI</p>
     <p>We’re making Swastik faster, smarter, and more beautiful. Back in few days!</p>
+    <p> © 2025 Swastik • All Rights Reserved</p>
+
   <script>
     // Theme Toggle
     document.getElementById('themeToggle').addEventListener('click', () => {
@@ -264,6 +266,17 @@
       const isLight = document.body.classList.contains('light');
       document.getElementById('themeToggle').textContent = isLight ? '🌑' : '☀️';
     });
+
+    // Particles
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = Math.random() * 100 + 'vw';
+      p.style.animationDelay = Math.random() * 8 + 's';
+      p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+      particlesContainer.appendChild(p);
+    }
 
   </script>
 </body>
