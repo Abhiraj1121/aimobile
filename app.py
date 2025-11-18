@@ -70,7 +70,7 @@ def ai_query(user_input, history=None, system_note=None):
     messages.append({"role": "user", "content": user_input})
 
     body = {
-        "model": "meta-llama/llama-3.3-70b-instruct:free",
+        "model": "openai/gpt-oss-20b:free",
         "messages": messages,
         "max_tokens": 800,
         "temperature": 0.2
