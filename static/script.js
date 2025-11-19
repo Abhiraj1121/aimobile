@@ -1,4 +1,4 @@
-// static/script.js – Mobile-First, Clean & Robust + Typing Animation
+// static/script.js – Final Version (2025) – Clickable Links + Perfect Mobile UX
 document.addEventListener('DOMContentLoaded', () => {
   // =================================================================
   // 1. MOBILE KEYBOARD + AUTO-SCROLL
@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const observer = new MutationObserver(scrollToBottom);
   observer.observe(chat, { childList: true, subtree: true });
 
+  // Adjust padding when keyboard opens
   window.visualViewport?.addEventListener('resize', () => {
     const diff = initialHeight - window.visualViewport.height;
     chat.style.paddingBottom = diff > 100 ? `${diff + 140}px` : '140px';
@@ -24,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
   scrollToBottom();
 
   // =================================================================
-  // 2. SWASTIK APP CORE
+  // 2. SWASTIK APP CORE – Enhanced with Clickable Links
   // =================================================================
   class SwastikApp {
     constructor() {
@@ -67,6 +68,31 @@ document.addEventListener('DOMContentLoaded', () => {
       };
     }
 
+    // Auto-link URLs, phone numbers, and emails
+    linkifyText(text) {
+      if (!text) return text;
+
+      // URLs (http, https)
+      text = text.replace(
+        /(https?:\/\/[^\s<]+[^<.,:;"')\]\s])/g,
+        '<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>'
+      );
+
+      // Phone numbers (Indian +91 or plain 10-digit)
+      text = text.replace(
+        /(\+91[-\s]?[0-9]{5}[-\s]?[0-9]{5}|[0-9]{10})/g,
+        '<a href="tel:$1">$1</a>'
+      );
+
+      // Email addresses
+      text = text.replace(
+        /([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/g,
+        '<a href="mailto:$1">$1</a>'
+      );
+
+      return text;
+    }
+
     bindEvents() {
       this.elements.send.addEventListener('click', () => this.send());
       this.elements.input.addEventListener('keydown', (e) => {
@@ -76,6 +102,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       });
 
+      // Voice input (hold mic or orb)
       ['mousedown', 'touchstart'].forEach(ev =>
         this.elements.mic.addEventListener(ev, (e) => {
           e.preventDefault();
@@ -104,12 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
         );
       }
 
+      // Menu & overlay controls
       this.elements.openMenu?.addEventListener('click', () => this.openMenu());
       this.elements.closeMenu?.addEventListener('click', () => this.closeMenu());
       this.elements.menuBackdrop?.addEventListener('click', () => this.closeMenu());
       this.elements.closeVoice?.addEventListener('click', () => this.closeVoiceOverlay());
       this.elements.swastikCore?.addEventListener('click', () => this.openVoiceOverlay());
 
+      // Settings
       [this.elements.themeToggle, this.elements.themeToggleMenu].forEach(btn =>
         btn?.addEventListener('click', () => this.toggleTheme())
       );
@@ -119,6 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
       this.elements.voiceOnlyToggleMenu?.addEventListener('click', () => this.toggleVoiceOverlay());
       this.elements.clearHistoryMenu?.addEventListener('click', () => this.clearHistory());
 
+      // Quick questions
       this.elements.chips.forEach(chip => {
         chip.addEventListener('click', () => {
           const q = chip.dataset.q;
@@ -135,15 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!msg) return;
 
       this.messages.push({ role: 'user', content: msg });
-      this.addBubble(msg, 'user');
+      this.addBubble(this.linkifyText(msg), 'user');
       this.elements.input.value = '';
 
-      // Show typing bubble
       const typingBubble = this.addBubble('', 'bot');
-      const typingText = typingBubble.querySelector('.typing-text');
 
       try {
-        const res = await fetch('https://aimobile.onrender.com/api/chat', {
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -153,28 +181,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         const data = await res.json();
 
-        // Remove typing bubble
         typingBubble.remove();
 
         const reply = data.reply || "Sorry, I couldn't respond.";
         this.messages.push({ role: 'assistant', content: reply });
-        this.addBubble(reply, 'bot'); // triggers typing animation
+        this.addBubble(reply, 'bot'); // Now with linkify
         if (!this.isMuted) this.speak(reply);
-      } catch {
+      } catch (err) {
         typingBubble.remove();
-        this.addBubble('Connection error. Try again.', 'bot');
+        this.addBubble('Connection error. Please try again.', 'bot');
       }
       this.saveHistory();
     }
 
-    // === TYPING ANIMATION + BUBBLE ===
+    // Enhanced bubble with clickable links
     addBubble(text, type) {
       const bubble = document.createElement('div');
       bubble.className = `bubble ${type}`;
       const time = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 
       if (type === 'bot' && text) {
-        // Bot reply with typing
         bubble.innerHTML = `
           <div class="typing-container">
             <span class="typing-text"></span>
@@ -183,11 +209,17 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="meta">${time}</div>
         `;
         this.elements.chat.appendChild(bubble);
-        this.typeReply(bubble.querySelector('.typing-text'), text);
+        const typingText = bubble.querySelector('.typing-text');
+
+        // Type first, then convert to clickable links
+        this.typeReply(typingText, text, () => {
+          typingText.innerHTML = this.linkifyText(text);
+          scrollToBottom();
+        });
       } else {
-        // User or empty typing bubble
-        bubble.innerHTML = text
-          ? `<div>${text}</div><div class="meta">${time}</div>`
+        const content = text ? this.linkifyText(text) : '';
+        bubble.innerHTML = content
+          ? `<div>${content}</div><div class="meta">${time}</div>`
           : `<div class="typing-container"><span class="typing-text"></span><span class="typing-cursor">|</span></div><div class="meta">${time}</div>`;
         this.elements.chat.appendChild(bubble);
         if (!text) scrollToBottom();
@@ -195,7 +227,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return bubble;
     }
 
-    typeReply(element, text, speed = 30) {
+    // Typing animation with callback when done
+    typeReply(element, text, onComplete = null) {
       let i = 0;
       const cursor = element.parentNode.querySelector('.typing-cursor');
       cursor.style.animation = 'blink 1s step-end infinite';
@@ -205,9 +238,10 @@ document.addEventListener('DOMContentLoaded', () => {
           element.textContent += text.charAt(i);
           i++;
           scrollToBottom();
-          setTimeout(type, speed + Math.random() * 20);
+          setTimeout(type, 25 + Math.random() * 25);
         } else {
           cursor.style.display = 'none';
+          if (onComplete) onComplete();
         }
       };
       setTimeout(type, 300);
@@ -222,6 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
       speechSynthesis.speak(utter);
     }
 
+    // Speech Recognition (unchanged)
     initSpeech() {
       if (!('webkitSpeechRecognition' in window)) return;
       const Rec = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -259,7 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
       this.recognition?.stop();
       this.listening = false;
       this.elements.mic?.classList.remove('listening');
-      this.elements.swastikCore?.classList.replace('listening', 'idle');
+      this.elements.swa
+stikCore?.classList.replace('listening', 'idle');
       this.elements.voiceCore?.classList.replace('listening', 'idle');
       this.elements.voiceStatus.textContent = 'Ready to chat';
     }
@@ -317,20 +353,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const saved = localStorage.getItem(this.HISTORY_KEY);
         if (saved) {
           this.messages = JSON.parse(saved);
-          this.messages.forEach(m => this.addBubble(m.content, m.role));
+          this.messages.forEach(m => this.addBubble(m.content, m.role === 'assistant' ? 'bot' : 'user'));
         }
-      } catch (e) { console.error('History load failed', e); }
+      } catch (e) {
+        console.error('History load failed', e);
+      }
     }
 
     addGreeting() {
       if (this.messages.length === 0) {
-        this.addBubble('Hi! Hold mic or tap orb to talk. Or type below!', 'bot');
+        this.addBubble('Hi! I am Swastik. Hold mic or tap orb to talk. Or type below!', 'bot');
       }
     }
   }
 
   // =================================================================
-  // 3. START APP
+  // 3. LAUNCH SWASTIK
   // =================================================================
   new SwastikApp();
 });
