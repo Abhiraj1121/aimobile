@@ -1,103 +1,207 @@
 import os
 import json
-from flask import Flask, render_template, request, jsonify
 import requests
+from flask import Flask, render_template, request, jsonify
 from dotenv import load_dotenv
-from flask_cors import CORS  # ✅ ADD THIS
+from flask_cors import CORS
 
-# Load environment variables (keep .env private)
+# Load environment variables from .env
 load_dotenv()
 
 app = Flask(__name__, static_folder="static", template_folder="templates")
-CORS(app)  # ✅ ENABLE CORS for GitHub Pages → Render connection
+CORS(app)
 
 # Config (set in your .env)
 AI_API_URL = os.getenv("AI_API_URL")  # e.g. https://openrouter.ai/api/v1/chat/completions
 AI_API_KEY = os.getenv("AI_API_KEY")
-SCHOOL_NAME = "Guru Gobind Singh Public School, Sector 5, Bokaro Steel City, Jharkhand, India"
+SCHOOL_NAME = "Guru Gobind Singh Public School (GGPS)"
 
 # Local Q&A file
 LOCAL_QA_PATH = os.path.join(os.path.dirname(__file__), "data", "school_data.txt")
 local_qa = {}
 if os.path.exists(LOCAL_QA_PATH):
     with open(LOCAL_QA_PATH, "r", encoding="utf-8") as f:
-        content = f.read().strip().split("\n\n")
-        for entry in content:
-            lines = [l.strip() for l in entry.splitlines() if l.strip()]
-            if len(lines) >= 2:
-                q = lines[0].lower()
-                a = " ".join(lines[1:])
-                local_qa[q] = a
+        content = f.read().strip()
+        if content:
+            # Entries separated by a blank line
+            entries = content.split("\n\n")
+            for entry in entries:
+                lines = [l.strip() for l in entry.splitlines() if l.strip()]
+                if len(lines) >= 2:
+                    q = lines[0].lower()
+                    a = " ".join(lines[1:])
+                    local_qa[q] = a
+
 
 def local_lookup(query):
+    """Return local answer if exact match found (case-insensitive)."""
+    if not query:
+        return None
     return local_qa.get(query.lower().strip())
 
+
+def _extract_text_from_choice(choice):
+    """Helper: Extract generated text from a choice dict (OpenRouter-style)."""
+    if not choice or not isinstance(choice, dict):
+        return None
+    # Newer style: choice["message"]["content"]
+    message = choice.get("message")
+    if isinstance(message, dict) and "content" in message:
+        return message["content"].strip()
+    # Older style: choice["text"]
+    text = choice.get("text")
+    if isinstance(text, str) and text.strip():
+        return text.strip()
+    return None
+
+
+def _call_model(body, headers, timeout=30):
+    """Call the AI API and return (status_code, response_json_or_text)."""
+    try:
+        resp = requests.post(AI_API_URL, headers=headers, json=body, timeout=timeout)
+        # Try to parse JSON if possible
+        try:
+            return resp.status_code, resp.json()
+        except Exception:
+            return resp.status_code, resp.text
+    except requests.exceptions.ReadTimeout:
+        return None, "timeout"
+    except Exception as e:
+        return None, str(e)
+
+
 def ai_query(user_input, history=None, system_note=None):
+    """
+    Query primary model; if it fails (non-200 or unexpected), try fallback model.
+    Returns a string reply (or friendly error message).
+    """
     if not AI_API_URL or not AI_API_KEY:
-        return "AI backend not configured. Please set AI_API_URL and AI_API_KEY environment variables."
+        return "Swastik: AI backend not configured. Please set AI_API_URL and AI_API_KEY environment variables."
+
+    # Build system prompt
+    system_note = system_note or (
+        "You are Swastik, the official AI assistant for Guru Gobind Singh Public School (GGPS). "
+        "Core goal: Answer accurately, confidently, and in a friendly, natural, conversational tone (polite and engaging). "
+        "Identity: Name: Swastik (meaning auspiciousness/good fortune). Developer: Group of 5 students of Class 11/C project. "
+        "Key School Data: Website: https://www.ggpsbokaro.com. Principal: Mr. Abhishek Kumar. "
+        "Contact: +91-65422-68589 / ggpsbok@rediffmail.com. Fee Payment: https://feepayment.ggpsbokaro.com. "
+        "Current Events: None. Constraint: Keep all answers short and precise. Only reply to the question which is asked. "
+        "Do not add any additional information unless asked."
+    )
+
+    # Build conversational messages
+    messages = [{"role": "system", "content": system_note}]
+    if history and isinstance(history, list):
+        # add up to last 12 messages (user/assistant)
+        for m in history[-12:]:
+            if m.get("role") in ("user", "assistant") and "content" in m:
+                messages.append({"role": m["role"], "content": m["content"]})
+    messages.append({"role": "user", "content": user_input})
 
     headers = {
         "Authorization": f"Bearer {AI_API_KEY}",
         "Content-Type": "application/json"
     }
 
-    system_note = system_note or (
-        "You are Swastik — the official AI assistant of Guru Gobind Singh Public School (GGPS), "
-        "Sector 5, Bokaro Steel City, Jharkhand, India. "
-        "Your goal is to help students, teachers, and visitors by answering questions in a friendly, "
-        "natural, and conversational tone. Speak like a real assistant — polite, confident, and engaging. "
-        f"When someone asks about {SCHOOL_NAME}, give helpful and accurate answers "
-        "based on known school details, public information, and policies. "
-        "Do not include personal, private, or confidential data. "
-        "If someone asks for your name, always reply: 'I am Swastik, your smart school assistant.' "
-        "You were developed by Abhi Raj Singh and his team from Class 11/C as part of their school project. "
-        f"Contact information of {SCHOOL_NAME}: Phone: +91-06542-268589 , Email: ggpsbok@rediffmail.com . "
-        "Fee Payment Link: https://feepayment.ggpsbokaro.com/parent/Login . "
-        "School Facebook Page: https://www.facebook.com/p/GGPSBokaro-100057053245791/ . "
-        "The current principal is Mr. Abhishek Kumar (joined in September 2025). "
-        "The official school website is https://ggpsbokaro.com/ . "
-        "Keep your answers short, natural, and respectful — never sound robotic or overly formal. "
-        "The term swastik (or swastika) originates from the Sanskrit word for well-being and is an ancient symbol "
-        "of good fortune and prosperity in many cultures, most notably Hinduism, Buddhism, and Jainism. "
-        "You are female (She/Her)."
-    )
-
-    messages = [{"role": "system", "content": system_note}]
-    if history and isinstance(history, list):
-        for m in history[-12:]:
-            if m.get("role") in ("user", "assistant") and "content" in m:
-                messages.append({"role": m["role"], "content": m["content"]})
-    messages.append({"role": "user", "content": user_input})
-
-    body = {
+    # Primary model (first attempt)
+    primary_body = {
         "model": "openai/gpt-oss-20b:free",
         "messages": messages,
         "max_tokens": 800,
         "temperature": 0.2
     }
 
-    try:
-        resp = requests.post(AI_API_URL, headers=headers, json=body, timeout=30)
-        if resp.status_code == 200:
-            data = resp.json()
-            if "choices" in data and len(data["choices"]) > 0:
-                choice = data["choices"][0]
-                if isinstance(choice.get("message"), dict) and "content" in choice["message"]:
-                    return choice["message"]["content"].strip()
-                if choice.get("text"):
-                    return choice["text"].strip()
-            if "text" in data:
-                return data["text"].strip()
-            return "Swastik: AI response format unexpected."
-        return f"Swastik: AI error {resp.status_code}: {resp.text}"
-    except requests.exceptions.ReadTimeout:
-        return "Swastik: Sorry, the AI server took too long to respond. Please try again shortly."
-    except Exception as e:
-        return f"Swastik: AI error: {str(e)}"
+    # Fallback model (used if primary fails or is rate-limited)
+    fallback_body = {
+        "model": "meta-llama/llama-3.3-70b-instruct:free",
+        "messages": messages,
+        "max_tokens": 600,
+        "temperature": 0.2
+    }
+
+    # --- Attempt primary ---
+    status, result = _call_model(primary_body, headers)
+    # status == None means network/exception happened
+    if status is None:
+        # Try fallback
+        status2, result2 = _call_model(fallback_body, headers)
+        if status2 == 200:
+            # parse choices
+            if isinstance(result2, dict) and "choices" in result2 and len(result2["choices"]) > 0:
+                text = _extract_text_from_choice(result2["choices"][0])
+                if text:
+                    return text
+            if isinstance(result2, dict) and "text" in result2:
+                return str(result2["text"]).strip()
+            return "Swastik: Backup AI responded in an unexpected format."
+        if status2 is None and result2 == "timeout":
+            return "Swastik: Sorry, the AI server took too long to respond. Please try again shortly."
+        return f"Swastik: Backup AI error: {result2}"
+
+    # Handle HTTP status codes for primary
+    if status == 200 and isinstance(result, dict):
+        # parse choices
+        if "choices" in result and len(result["choices"]) > 0:
+            text = _extract_text_from_choice(result["choices"][0])
+            if text:
+                return text
+        if "text" in result:
+            return str(result["text"]).strip()
+        # Unexpected format from primary — try fallback
+        status2, result2 = _call_model(fallback_body, headers)
+        if status2 == 200 and isinstance(result2, dict):
+            if "choices" in result2 and len(result2["choices"]) > 0:
+                text = _extract_text_from_choice(result2["choices"][0])
+                if text:
+                    return text
+            if "text" in result2:
+                return str(result2["text"]).strip()
+            return "Swastik: Backup AI responded in an unexpected format."
+        if status2 is None and result2 == "timeout":
+            return "Swastik: Sorry, the AI server took too long to respond. Please try again shortly."
+        return f"Swastik: Backup AI error {status2}: {result2}"
+
+    # If primary returned 429 (rate limit) try fallback before telling user to wait
+    if status == 429:
+        status2, result2 = _call_model(fallback_body, headers)
+        if status2 == 200 and isinstance(result2, dict):
+            if "choices" in result2 and len(result2["choices"]) > 0:
+                text = _extract_text_from_choice(result2["choices"][0])
+                if text:
+                    return text
+            if "text" in result2:
+                return str(result2["text"]).strip()
+            return "Swastik: Backup AI responded in an unexpected format."
+        # If fallback also rate-limited or fails, inform the user
+        if status2 == 429:
+            return "Swastik: Too many requests to the AI services right now. Please wait a few moments and try again."
+        if status2 is None and result2 == "timeout":
+            return "Swastik: Sorry, the AI server took too long to respond. Please try again shortly."
+        return f"Swastik: AI rate-limited (primary). Backup AI error {status2}: {result2}"
+
+    # If primary returned another 4xx/5xx error, try fallback
+    if 400 <= status < 600:
+        status2, result2 = _call_model(fallback_body, headers)
+        if status2 == 200 and isinstance(result2, dict):
+            if "choices" in result2 and len(result2["choices"]) > 0:
+                text = _extract_text_from_choice(result2["choices"][0])
+                if text:
+                    return text
+            if "text" in result2:
+                return str(result2["text"]).strip()
+            return "Swastik: Backup AI responded in an unexpected format."
+        if status2 is None and result2 == "timeout":
+            return "Swastik: Sorry, the AI server took too long to respond. Please try again shortly."
+        return f"Swastik: AI error {status}: {result}"
+
+    # Fallback generic
+    return "Swastik: Unexpected AI error. Please try again later."
+
 
 @app.route("/")
 def index():
     return render_template("index.html", school_name=SCHOOL_NAME, bot_name="Swastik")
+
 
 @app.route("/api/chat", methods=["POST"])
 def chat():
@@ -106,14 +210,22 @@ def chat():
     history = payload.get("history", [])
 
     if not msg:
-        return jsonify({"reply": "Swastik: It seems like your message is empty. How can I assist you today?", "source": "system"})
+        return jsonify({
+            "reply": "Swastik: It seems like your message is empty. How can I assist you today?",
+            "source": "system"
+        })
 
+    # Check local Q&A first
     local = local_lookup(msg)
     if local:
         return jsonify({"reply": local, "source": "local"})
 
+    # Query AI
     reply = ai_query(msg, history=history)
     return jsonify({"reply": reply, "source": "ai"})
 
+
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=int(os.getenv("PORT", 5000)))
+    # default port is 5000; override with PORT env var
+    port = int(os.getenv("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
