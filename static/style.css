@@ -418,3 +418,26 @@ body {
   color: var(--text-muted); 
   text-align: center;
 }
+/* Clickable Links in Chat Bubbles */
+.bubble a {
+  color: var(--accent-blue);  /* Bright blue for visibility */
+  text-decoration: underline;
+  word-break: break-all;      /* Prevents overflow on long URLs */
+  transition: color 0.2s ease;
+}
+.bubble a:hover,
+.bubble a:active {
+  color: var(--accent-purple);  /* Purple on tap/hover */
+  text-decoration: none;        /* Smooth feel */
+}
+.bubble a:visited {
+  color: var(--accent-pink);    /* Subtle visited state */
+}
+
+/* Mobile Tap Target (ensures easy tapping) */
+.bubble a {
+  display: inline-block;
+  padding: 2px 4px;             /* Extra touch area */
+  border-radius: 4px;
+  min-height: 1.2em;            /* Better for fingers */
+}
