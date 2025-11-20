@@ -22,7 +22,7 @@
         <h2>Swastik</h2>
         <p>GGPS Sector 5</p>
       </div>
-      <button id="closeMenu" class="close-menu">❌</button>
+      <button id="closeMenu" class="close-menu">X</button>
     </div>
 
     <!-- Quick Questions -->
@@ -40,7 +40,6 @@
     <div class="menu-section">
       <h3>Settings</h3>
 
-      <!-- Theme -->
       <button id="themeToggleMenu" class="menu-toggle">
         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="5"/>
@@ -49,7 +48,6 @@
         <span class="label">Theme</span>
       </button>
 
-      <!-- Mute -->
       <button id="muteToggleMenu" class="menu-toggle">
         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M11 5L6 9H2v6h4l5 4V5z"/>
@@ -58,7 +56,6 @@
         <span class="label">Sound</span>
       </button>
 
-      <!-- Voice Mode -->
       <button id="voiceOnlyToggleMenu" class="menu-toggle">
         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
@@ -74,12 +71,24 @@
       <h3>Chat History</h3>
       <div class="history-controls">
         <button id="clearHistoryMenu" class="small-btn danger">Clear History</button>
-      </button>
       </div>
     </div>
 
+    <!-- Privacy Policy Link (New!) -->
+    <div class="menu-section privacy-section">
+      <a href="https://abhiraj1121.github.io/ai-tc/" target="_blank" class="privacy-link">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 11V9a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-2"/>
+          <path d="M12 12l3-3"/>
+          <path d="M15 9v6"/>
+        </svg>
+        <span>Privacy Policy</span>
+      </a>
+    </div>
+
+    <!-- Footer -->
     <div class="menu-footer">
-      <small>© 2025 Swastik • All Rights Reserved</small>
+      <small>© 2025 Swastik • Made with ❤️ by Abhi Raj Singh</small>
     </div>
   </div>
 
@@ -87,10 +96,8 @@
 
   <!-- ======================  MAIN APP  ====================== -->
   <div class="app-container">
-
     <!-- Top Bar -->
     <header class="topbar">
-      <!-- Hamburger Menu -->
       <button id="openMenu" class="icon-btn" title="Menu">
         <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="3" y1="12" x2="21" y2="12"/>
@@ -100,9 +107,7 @@
       </button>
 
       <div class="core-wrapper">
-        <!-- 3D Glass Orb -->
         <div id="swastikCore" class="swastik-core idle" title="Tap for Voice Mode"></div>
-
         <div class="core-labels">
           <div class="bot-name">Swastik</div>
           <div id="voiceStatus" class="voice-status">Ready to chat</div>
@@ -110,7 +115,6 @@
       </div>
 
       <div class="top-actions">
-        <!-- Theme Toggle -->
         <button id="themeToggle" class="icon-btn" title="Toggle Theme">
           <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="5"/>
@@ -118,7 +122,6 @@
           </svg>
         </button>
 
-        <!-- Mute Toggle -->
         <button id="muteToggle" class="icon-btn" title="Toggle Sound">
           <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M11 5L6 9H2v6h4l5 4V5z"/>
@@ -128,7 +131,6 @@
       </div>
     </header>
 
-    <!-- Chat Area -->
     <main id="chat" class="chat" aria-live="polite"></main>
   </div>
 
@@ -152,9 +154,9 @@
     </button>
   </div>
 
-  <!-- ======================  VOICE-ONLY OVERLAY (Centered) ====================== -->
+  <!-- ======================  VOICE-ONLY OVERLAY  ====================== -->
   <div id="voiceOverlay" class="voice-overlay">
-    <button id="closeVoice" class="close-overlay">❌</button>
+    <button id="closeVoice" class="close-overlay">X</button>
     <div class="voice-panel">
       <div id="voiceCore" class="assistant-core idle"></div>
       <p class="voice-hint">Hold to speak • Release to reply</p>
