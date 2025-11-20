@@ -1,283 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Swastik • Under Construction</title>
-  <link rel="icon" type="image/jpg" size=32×32 href="static/swastik.jpg" />
-  <link rel="apple-touch-icon" href="static/swastik.jpg" />
-
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@700&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --bg-dark: #0a0e1f;
-      --accent-purple: #7f5af0;
-      --accent-blue: #00e5ff;
-      --accent-pink: #ff77e9;
-      --glass: rgba(255, 255, 255, 0.08);
-      --text: #e8f1ff;
-      --muted: #a0a8c0;
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg-dark);
-      color: var(--text);
-      overflow: hidden;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-
-    /* Animated Background */
-    body::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: 
-        radial-gradient(circle at 20% 80%, rgba(127, 90, 240, 0.3) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(0, 229, 255, 0.25) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(255, 119, 233, 0.15) 0%, transparent 60%);
-      background-size: 200% 200%;
-      animation: bgFlow 18s ease infinite;
-      z-index: -2;
-    }
-
-    @keyframes bgFlow {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
-    }
-
-    /* Floating Particles */
-    .particles {
-      position: absolute;
-      inset: 0;
-      z-index: -1;
-      overflow: hidden;
-    }
-
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: var(--accent-blue);
-      border-radius: 50%;
-      opacity: 0;
-      box-shadow: 0 0 10px var(--accent-blue);
-      animation: float 8s infinite ease-in-out;
-    }
-
-    @keyframes float {
-      0% { transform: translateY(100vh) scale(0); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-20px) scale(1); opacity: 0; }
-    }
-
-    /* 3D Glass Orb */
-    .orb-container {
-      perspective: 1000px;
-      margin-bottom: 2rem;
-    }
-
-    .swastik-orb {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      position: relative;
-      background: radial-gradient(circle at 30% 30%,
-                  rgba(255,255,255,0.5) 0%,
-                  rgba(127,90,240,0.3) 40%,
-                  rgba(0,229,255,0.15) 70%,
-                  transparent 100%);
-      box-shadow:
-          0 0 40px rgba(127,90,240,0.6),
-          0 0 80px rgba(0,229,255,0.3),
-          inset 0 8px 16px rgba(255,255,255,0.4),
-          inset 0 -8px 16px rgba(0,0,0,0.25);
-      animation: rotate3D 8s infinite linear, pulse 3s ease-in-out infinite;
-      transform-style: preserve-3d;
-    }
-
-    .swastik-orb::before {
-      content: '';
-      position: absolute;
-      inset: 12px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 35% 30%,
-                  rgba(255,255,255,0.7) 0%,
-                  rgba(127,90,240,0.45) 45%,
-                  rgba(0,229,255,0.25) 75%,
-                  transparent 100%);
-      box-shadow: inset 0 6px 14px rgba(255,255,255,0.6),
-                  inset 0 -6px 14px rgba(0,0,0,0.2);
-    }
-
-    .swastik-orb::after {
-      content: '';
-      position: absolute;
-      top: 30px;
-      left: 30px;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(255,255,255,0.95), rgba(255,255,255,0.5));
-      box-shadow: 0 0 20px rgba(255,255,255,0.9);
-      filter: blur(1px);
-    }
-
-    @keyframes rotate3D {
-      from { transform: rotateY(0deg) rotateX(5deg); }
-      to { transform: rotateY(360deg) rotateX(5deg); }
-    }
-
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    /* Glass Card */
-    .card {
-      background: var(--glass);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-radius: 20px;
-      padding: 2rem;
-      width: 90%;
-      max-width: 380px;
-      text-align: center;
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-       815        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      animation: cardFloat 6s ease-in-out infinite;
-    }
-
-    @keyframes cardFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-
-    h1 {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.8rem;
-      margin: 1rem 0 0.5rem;
-      background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-
-    p {
-      font-size: 1rem;
-      opacity: 0.9;
-      margin-bottom: 1.5rem;
-      line-height: 1.5;
-    }
-
-    .status {
-      font-size: 0.9rem;
-      color: var(--accent-blue);
-      margin-bottom: 1rem;
-      font-weight: 600;
-    }
-
-    /* Theme Toggle */
-    .theme-toggle {
-      position: absolute;
-      top: 1.5rem;
-      right: 1.5rem;
-      background: var(--glass);
-      border: none;
-      color: white;
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      font-size: 1.2rem;
-      cursor: pointer;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-    }
-
-    /* Light Mode */
-    body.light {
-      --bg-dark: #f5f8ff;
-      --text: #1a1a2e;
-      --muted: #666;
-      --glass: rgba(255, 255, 255, 0.7);
-    }
-
-    body.light .card {
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-
-    body.light .swastik-orb {
-      box-shadow:
-          0 0 40px rgba(127,90,240,0.4),
-          0 0 80px rgba(0,229,255,0.2),
-          inset 0 8px 16px rgba(255,255,255,0.6),
-          inset 0 -8px 16px rgba(0,0,0,0.15);
-    }
-
-    /* Responsive */
-    @media (max-width: 480px) {
-      .swastik-orb { width: 120px; height: 120px; }
-      .swastik-orb::after { top: 24px; left: 24px; width: 24px; height: 24px; }
-      h1 { font-size: 1.5rem; }
-      .countdown { gap: 0.75rem; }
-      .time-box { padding: 0.6rem 0.8rem; }
-      .time-box span { font-size: 1.2rem; }
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Swastik • GGPS Sector 5</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="static/Swastik.jpg">
+  <link rel="apple-touch-icon" href="static/Swastik.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/style.css">
+  <link rel="icon" href="static/Swastik.jpg">
+  <meta name="theme-color" content="#7f5af0">
 </head>
-<body class="Dark">
-  <!-- Theme Toggle -->
-  <button class="theme-toggle" id="themeToggle">☀️</button>
 
-  <!-- Floating Particles -->
-  <div class="particles" id="particles"></div>
+<body class="dark">
 
-  <div class="card">
-    <!-- 3D Orb -->
-    <div class="orb-container">
-      <div class="swastik-orb"></div>
+  <!-- ======================  MOBILE MENU  ====================== -->
+  <div id="mobileMenu" class="mobile-menu">
+    <div class="menu-header">
+      <img src="static/Swastik.jpg" alt="Swastik" class="menu-logo">
+      <div>
+        <h2>Swastik</h2>
+        <p>GGPS Sector 5</p>
+      </div>
+      <button id="closeMenu" class="close-menu">❌</button>
     </div>
 
-    <h1>Swastik is Evolving</h1>
-    <p class="status">Optimizing for Mobile • AI Upgrades • 3D UI</p>
-    <p>We’re making Swastik faster, smarter, and more beautiful. Back in few days!</p>
-    <p> © 2025 Swastik • All Rights Reserved</p>
+    <!-- Quick Questions -->
+    <div class="menu-section">
+      <h3>Quick Questions</h3>
+      <div class="quick-chips">
+        <button class="chip" data-q="What are the school hours?">School hours</button>
+        <button class="chip" data-q="What is the attendance requirement to sit for exams?">Attendance</button>
+        <button class="chip" data-q="How to pay fees online?">Fee payment</button>
+        <button class="chip" data-q="How to take admission in school?">Admission</button>
+      </div>
+    </div>
 
-  <script>
-    // Theme Toggle
-    document.getElementById('themeToggle').addEventListener('click', () => {
-      document.body.classList.toggle('light');
-      const isLight = document.body.classList.contains('light');
-      document.getElementById('themeToggle').textContent = isLight ? '🌑' : '☀️';
-    });
+    <!-- Settings -->
+    <div class="menu-section">
+      <h3>Settings</h3>
 
-    // Particles
-    const particlesContainer = document.getElementById('particles');
-    for (let i = 0; i < 30; i++) {
-      const p = document.createElement('div');
-      p.className = 'particle';
-      p.style.left = Math.random() * 100 + 'vw';
-      p.style.animationDelay = Math.random() * 8 + 's';
-      p.style.animationDuration = (Math.random() * 5 + 5) + 's';
-      particlesContainer.appendChild(p);
-    }
+      <!-- Theme -->
+      <button id="themeToggleMenu" class="menu-toggle">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42"/>
+        </svg>
+        <span class="label">Theme</span>
+      </button>
 
-  </script>
+      <!-- Mute -->
+      <button id="muteToggleMenu" class="menu-toggle">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        </svg>
+        <span class="label">Sound</span>
+      </button>
+
+      <!-- Voice Mode -->
+      <button id="voiceOnlyToggleMenu" class="menu-toggle">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+          <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+          <line x1="12" y1="19" x2="12" y2="23"/>
+        </svg>
+        <span class="label">Voice Mode</span>
+      </button>
+    </div>
+
+    <!-- Chat History -->
+    <div class="menu-section">
+      <h3>Chat History</h3>
+      <div class="history-controls">
+        <button id="clearHistoryMenu" class="small-btn danger">Clear History</button>
+      </button>
+      </div>
+    </div>
+
+    <div class="menu-footer">
+      <small>© 2025 Swastik • All Rights Reserved</small>
+    </div>
+  </div>
+
+  <div id="menuBackdrop" class="menu-backdrop"></div>
+
+  <!-- ======================  MAIN APP  ====================== -->
+  <div class="app-container">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <!-- Hamburger Menu -->
+      <button id="openMenu" class="icon-btn" title="Menu">
+        <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+
+      <div class="core-wrapper">
+        <!-- 3D Glass Orb -->
+        <div id="swastikCore" class="swastik-core idle" title="Tap for Voice Mode"></div>
+
+        <div class="core-labels">
+          <div class="bot-name">Swastik</div>
+          <div id="voiceStatus" class="voice-status">Ready to chat</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <!-- Theme Toggle -->
+        <button id="themeToggle" class="icon-btn" title="Toggle Theme">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42"/>
+          </svg>
+        </button>
+
+        <!-- Mute Toggle -->
+        <button id="muteToggle" class="icon-btn" title="Toggle Sound">
+          <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Chat Area -->
+    <main id="chat" class="chat" aria-live="polite"></main>
+  </div>
+
+  <!-- ======================  FIXED COMPOSER  ====================== -->
+  <div class="composer">
+    <button id="mic" class="mic-btn" title="Hold to speak">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+        <line x1="12" y1="19" x2="12" y2="23"/>
+      </svg>
+    </button>
+
+    <input id="msg" type="text" placeholder="Ask about school…" autocomplete="off">
+
+    <button id="send" class="send-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"/>
+        <polygon points="22,2 15,22 11,13 2,9 22,2"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- ======================  VOICE-ONLY OVERLAY (Centered) ====================== -->
+  <div id="voiceOverlay" class="voice-overlay">
+    <button id="closeVoice" class="close-overlay">❌</button>
+    <div class="voice-panel">
+      <div id="voiceCore" class="assistant-core idle"></div>
+      <p class="voice-hint">Hold to speak • Release to reply</p>
+    </div>
+  </div>
+
+  <script src="static/script.js"></script>
 </body>
 </html>
