@@ -2,6 +2,8 @@
 
 Swastik mini is an AI-powered school assistant designed for Guru Gobind Singh Public School, Sector 5. It helps students and visitors interact with school information, subject knowledge (classes 8–12), and policies through a friendly web-based chatbot interface. It supports voice input and output, quick replies, and AI-enhanced responses. made only for mobile versions.
 
+Legal Documents : https://abhiraj1121.github.io/ai-tc/
+
 ---
 
 🚀 Features
