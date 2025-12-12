@@ -13,8 +13,7 @@ CORS(app)
 
 # Config (set in your .env)
 AI_API_URL = os.getenv("AI_API_URL")  # e.g. https://openrouter.ai/api/v1/chat/completions
-AI_API_KEY = os.getenv("AI_API_KEY")
-SCHOOL_NAME = "Guru Gobind Singh Public School (GGPS)"
+AI_API_KEY = os.getenv("AI_API_KEY")  # your API key for the AI service
 
 # Local Q&A file
 LOCAL_QA_PATH = os.path.join(os.path.dirname(__file__), "data", "school_data.txt")
@@ -80,13 +79,17 @@ def ai_query(user_input, history=None, system_note=None):
 
     # Build system prompt
     system_note = system_note or (
-        "You are Swastik, the official AI assistant for Guru Gobind Singh Public School (GGPS). "
-        "Core goal: Answer accurately, confidently, and in a friendly, natural, conversational tone (polite and engaging). "
-        "Identity: Name: Swastik (meaning auspiciousness/good fortune). Developer: Group of 5 students of Class 11/C project. "
-        "Key School Data: Website: https://www.ggpsbokaro.com. Principal: Mr. Abhishek Kumar. "
-        "Contact: +91-65422-68589 / ggpsbok@rediffmail.com. Fee Payment: https://feepayment.ggpsbokaro.com. "
-        "Current Events: None. Constraint: Keep all answers short and precise. Only reply to the question which is asked. "
-        "Do not add any additional information unless asked."
+        "You are Swastik, an intelligent AI assistant designed to communicate in a friendly, natural, and helpful manner."
+        "Your goals are:"
+        "- Understand user input clearly."
+        "- Respond accurately and confidently."
+        "- Keep answers concise unless the user asks for more detail."
+        "- Maintain a conversational, polite tone."
+        "- Avoid giving unnecessary information or assumptions."
+        "- Support both simple and complex queries across general knowledge, reasoning, coding, explanations, and tasks."
+        "If a question is unclear, ask politely for clarification."
+        "Do not invent facts; rely on reasoning and safe, reliable information."
+
     )
 
     # Build conversational messages
@@ -105,7 +108,7 @@ def ai_query(user_input, history=None, system_note=None):
 
     # Primary model (first attempt)
     primary_body = {
-        "model": "openai/gpt-oss-20b:free",
+        "model": "meta-llama/llama-3.3-70b-instruct:free",
         "messages": messages,
         "max_tokens": 800,
         "temperature": 0.2
@@ -113,7 +116,7 @@ def ai_query(user_input, history=None, system_note=None):
 
     # Fallback model (used if primary fails or is rate-limited)
     fallback_body = {
-        "model": "meta-llama/llama-3.3-70b-instruct:free",
+        "model": "openai/gpt-oss-20b:free",
         "messages": messages,
         "max_tokens": 600,
         "temperature": 0.2
@@ -200,7 +203,7 @@ def ai_query(user_input, history=None, system_note=None):
 
 @app.route("/")
 def index():
-    return render_template("index.html", school_name=SCHOOL_NAME, bot_name="Swastik")
+    return render_template("index.html", bot_name="Swastik")
 
 
 @app.route("/api/chat", methods=["POST"])
