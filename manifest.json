@@ -1,0 +1,15 @@
+{
+  "name": "Swastik",                // Full name of your app
+  "short_name": "Swastik",          // Name shown under the app icon
+  "start_url": ".",                 // Entry point when app is launched
+  "display": "standalone",          // No browser UI (like address bar)
+  "background_color": "#000000",    // Background color while loading
+  "theme_color": "#000000",         // Color of the browser UI
+  "icons": [
+    {
+      "src": "icon.png",            // Path to your app icon
+      "sizes": "192x192",           // Icon size
+      "type": "image/png"           // File type
+    }
+  ]
+}
