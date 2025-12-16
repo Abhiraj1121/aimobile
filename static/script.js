@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const typingBubble = this.addBubble('', 'bot');
 
       try {
-        const res = await fetch('https://aimobile.onrender.com/api/chat', {
+        const res = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -291,19 +291,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     stopListening() {
       if (!this.listening) return;
-      this.recognition?.stop();
+      try {
+        this.recognition?.stop();
+      } catch (e) {}
       this.listening = false;
       this.elements.mic?.classList.remove('listening');
-      this.elements.swa
-stikCore?.classList.replace('listening', 'idle');
-      this.elements.voiceCore?.classList.replace('listening', 'idle');
+      this.elements.swastikCore?.classList.remove('listening');
+      this.elements.swastikCore?.classList.add('idle');
+      this.elements.voiceCore?.classList.remove('listening');
+      this.elements.voiceCore?.classList.add('idle');
       this.elements.voiceStatus.textContent = 'Ready to chat';
     }
+
 
     openMenu() { this.elements.mobileMenu.classList.add('open'); this.elements.menuBackdrop.classList.add('active'); }
     closeMenu() { this.elements.mobileMenu.classList.remove('open'); this.elements.menuBackdrop.classList.remove('active'); }
     openVoiceOverlay() { this.elements.voiceOverlay.classList.add('active'); }
-    closeVoiceOverlay() { this.elements.voiceOverlay.classList.remove('active'); this.stopListening(); }
+    closeVoiceOverlay() {
+      this.elements.voiceOverlay.classList.remove('active');
+      this.listening = false;
+      this.elements.voiceStatus.textContent = 'Ready to chat';
+      this.elements.mic?.classList.remove('listening');
+      this.elements.swastikCore?.classList.remove('listening');
+      this.elements.swastikCore?.classList.add('idle');
+      this.elements.voiceCore?.classList.remove('listening');
+      this.elements.voiceCore?.classList.add('idle');
+      try {
+        this.recognition?.stop();
+      } catch (e) {}
+    }
+
     toggleVoiceOverlay() { this.elements.voiceOverlay.classList.contains('active') ? this.closeVoiceOverlay() : this.openVoiceOverlay(); }
 
     toggleTheme() {
@@ -312,7 +329,7 @@ stikCore?.classList.replace('listening', 'idle');
       const icon = isLight
         ? `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
         : `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42"/></svg>`;
-      const label = isLight ? 'Dark Mode' : 'Light Mode';
+      const label = isLight ? '' : '';
       [this.elements.themeToggle, this.elements.themeToggleMenu].forEach(el => {
         if (el) {
           el.innerHTML = `${icon} <span class="label">${label}</span>`;
@@ -326,7 +343,7 @@ stikCore?.classList.replace('listening', 'idle');
       const icon = this.isMuted
         ? `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1v22M1 12h22"/></svg>`
         : `<svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>`;
-      const label = this.isMuted ? 'Unmute' : 'Mute';
+      const label = this.isMuted ? '' : '';
       [this.elements.muteToggle, this.elements.muteToggleMenu].forEach(el => {
         if (el) {
           el.innerHTML = `${icon} <span class="label">${label}</span>`;
