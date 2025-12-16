@@ -22,14 +22,14 @@ body.light {
   --text: #1a202c;
   --text-muted: #718096;
   background: linear-gradient(135deg, rgba(248, 250, 255, 0.95), rgba(233, 237, 255, 0.98)),
-              url('/static/wallpaper.jpg') center/cover fixed;
+              url('static/wallpaper.jpg') center/cover fixed;
 }
 
 body {
   margin: 0;
   font-family: 'Inter', system-ui, sans-serif;
   background: linear-gradient(135deg, rgba(15, 20, 40, 0.85), rgba(5, 10, 25, 0.92)),
-              url('/static/wallpaper.jpg') center/cover fixed;
+              url('static/wallpaper.jpg') center/cover fixed;
   color: var(--text);
   min-height: 100dvh;
   overflow: hidden;
