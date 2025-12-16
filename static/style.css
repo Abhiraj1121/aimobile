@@ -441,3 +441,157 @@ body {
   border-radius: 4px;
   min-height: 1.2em;            /* Better for fingers */
 }
+/* ========================= */
+/* 🧠 MARKDOWN STYLES (CHAT) */
+/* ========================= */
+
+.ai-text {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  word-wrap: break-word;
+}
+
+/* ---------- HEADINGS ---------- */
+.ai-text h1 {
+  font-size: 1.4rem;
+  margin: 0.8em 0 0.4em;
+  border-bottom: 2px solid rgba(127,90,240,0.4);
+}
+.ai-text h2 {
+  font-size: 1.25rem;
+  margin: 0.8em 0 0.4em;
+}
+.ai-text h3 {
+  font-size: 1.1rem;
+  margin: 0.6em 0 0.3em;
+}
+
+/* ---------- TEXT ---------- */
+.ai-text p {
+  margin: 0.4em 0;
+}
+.ai-text strong {
+  font-weight: 700;
+  color: #ffdc7a;
+}
+.ai-text em {
+  font-style: italic;
+  opacity: 0.9;
+}
+.ai-text del {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* ---------- LINKS ---------- */
+.ai-text a {
+  color: #00e5ff;
+  text-decoration: underline;
+  word-break: break-all;
+}
+.ai-text a:hover {
+  color: #7f5af0;
+}
+
+/* ---------- LISTS ---------- */
+.ai-text ul,
+.ai-text ol {
+  margin: 0.4em 0 0.6em 1.2em;
+  padding: 0;
+}
+.ai-text li {
+  margin: 0.3em 0;
+}
+
+/* ---------- BLOCKQUOTE ---------- */
+.ai-text blockquote {
+  margin: 0.6em 0;
+  padding: 0.6em 1em;
+  border-left: 4px solid #7f5af0;
+  background: rgba(127,90,240,0.12);
+  color: #cbd5ff;
+}
+
+/* ---------- INLINE CODE ---------- */
+.ai-text code {
+  background: rgba(0,0,0,0.45);
+  color: #ff7ad9;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+}
+
+/* ---------- CODE BLOCK ---------- */
+.ai-text pre {
+  background: #0b0f1f;
+  border-radius: 14px;
+  padding: 14px;
+  overflow-x: auto;
+  margin: 0.8em 0;
+  box-shadow: inset 0 0 0 1px rgba(127,90,240,0.3);
+}
+
+.ai-text pre code {
+  background: none;
+  padding: 0;
+  color: #dbe4ff;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: block;
+  white-space: pre;
+}
+
+/* ---------- TABLES ---------- */
+.ai-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.8em 0;
+  font-size: 0.9rem;
+}
+.ai-text th,
+.ai-text td {
+  border: 1px solid rgba(255,255,255,0.15);
+  padding: 8px 10px;
+}
+.ai-text th {
+  background: rgba(127,90,240,0.25);
+  font-weight: 600;
+}
+.ai-text tr:nth-child(even) {
+  background: rgba(255,255,255,0.04);
+}
+
+/* ---------- HORIZONTAL RULE ---------- */
+.ai-text hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    rgba(127,90,240,0.6),
+    transparent
+  );
+  margin: 1em 0;
+}
+
+/* ---------- IMAGES ---------- */
+.ai-text img {
+  max-width: 100%;
+  border-radius: 12px;
+  margin: 0.6em 0;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+.ai-text img:hover {
+  transform: scale(1.02);
+  transition: transform 0.2s ease;
+}
+/* ---------- MATH (LaTeX) ---------- */
+.ai-text .katex {
+  font-size: 1rem;
+  margin: 0.4em 0;
+}
+.ai-text .katex-display {
+  margin: 0.8em 0;
+  text-align: center;
+}
