@@ -202,21 +202,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (type === 'bot' && text) {
         bubble.innerHTML = `
-          <div class="typing-container">
-            <span class="typing-text"></span>
-            <span class="typing-cursor">|</span>
-          </div>
-          <div class="meta">${time}</div>
-        `;
-        this.elements.chat.appendChild(bubble);
-        const typingText = bubble.querySelector('.typing-text');
-
-        // Type first, then convert to clickable links
-        this.typeReply(typingText, text, () => {
-          typingText.innerHTML = this.linkifyText(text);
-          scrollToBottom();
-        });
-      } else {
+        <div class="typing-container">
+         <div class="ai-text typing-text"></div>
+         <span class="typing-cursor">|</span>
+        </div>
+        <div class="meta">${time}</div>
+      `;
+      this.elements.chat.appendChild(bubble);
+      const typingText = bubble.querySelector('.typing-text');
+      this.typeReply(typingText, text, () => {
+        typingText.innerHTML = this.linkifyText(marked.parse(text));
+        scrollToBottom();
+      });
+    } else {
         const content = text ? this.linkifyText(text) : '';
         bubble.innerHTML = content
           ? `<div>${content}</div><div class="meta">${time}</div>`
@@ -228,23 +226,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Typing animation with callback when done
-    typeReply(element, text, onComplete = null) {
+    typeReply(element, rawText, onComplete = null) {
       let i = 0;
       const cursor = element.parentNode.querySelector('.typing-cursor');
       cursor.style.animation = 'blink 1s step-end infinite';
-
       const type = () => {
-        if (i < text.length) {
-          element.textContent += text.charAt(i);
+        if (i < rawText.length) {
           i++;
+          element.innerHTML = marked.parse(rawText.slice(0, i));
           scrollToBottom();
-          setTimeout(type, 25 + Math.random() * 25);
+          setTimeout(type, 20);
         } else {
           cursor.style.display = 'none';
+          element.innerHTML = marked.parse(rawText);
           if (onComplete) onComplete();
         }
       };
-      setTimeout(type, 300);
+      setTimeout(type, 200);
     }
 
     speak(text) {
