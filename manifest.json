@@ -1,15 +1,47 @@
 {
-  "name": "Swastik",                // Full name of your app
-  "short_name": "Swastik",          // Name shown under the app icon
-  "start_url": ".",                 // Entry point when app is launched
-  "display": "standalone",          // No browser UI (like address bar)
-  "background_color": "#000000",    // Background color while loading
-  "theme_color": "#000000",         // Color of the browser UI
+  "name": "Swastik AI Assistant",
+  "short_name": "Swastik",
+  "description": "Swastik is an intelligent AI assistant with voice interaction and smart chat features.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0f1a",
+  "theme_color": "#6a11cb",
+  "categories": ["education", "productivity", "ai"],
+  "lang": "en-IN",
+
   "icons": [
     {
-      "src": "icon.png",            // Path to your app icon
-      "sizes": "192x192",           // Icon size
-      "type": "image/png"           // File type
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
